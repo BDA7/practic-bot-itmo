@@ -151,7 +151,8 @@ async def register_work_industrial_practice(message: types.Message, state: FSMCo
     async with state.proxy() as data:
         data['work_industrial_practice'] = message.text
 
-    await message.reply('Если <b>производственная практика</b> в сторонней организации и подписана заявка, загрузите '
+    await message.reply('Если <b>производственная практика</b> в сторонней организации и подписана заявка, '
+                        'Отправьте ссылку на заявку '
                         'заявку'
                         '<b>Если у вас нет заявки напишите "-"</b>', parse_mode='html')
     await Profile.next()
@@ -159,9 +160,8 @@ async def register_work_industrial_practice(message: types.Message, state: FSMCo
 
 @dp.message_handler(state=Profile.other_industrial_practice_fileName)
 async def register_other_industrial_practice_fileName(message: types.Message, state: FSMContext) -> None:
-    if message.text == '-':
-        async with state.proxy() as data:
-            data['other_industrial_practice_fileName'] = message.text
+    async with state.proxy() as data:
+        data['other_industrial_practice_fileName'] = message.document.file_id
 
     await message.reply('<b>Преддипломная практика</b>\n1.Руководитель ВКР уже есть,\n2.Руководителя '
                         'ВКР ещё нет'
