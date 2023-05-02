@@ -50,6 +50,11 @@ async def register(message: types.Message) -> None:
     await Profile.name.set()
 
 
+@dp.message_handler(lambda message: message.text in ['/start', '/register', '/popular_questions'], state=Profile.name)
+async def invalid_register_name(message: types.Message) -> None:
+    await message.answer('Некорректное имя')
+
+
 @dp.message_handler(state=Profile.name)
 async def register_name(message: types.Message, state: FSMContext) -> None:
     async with state.proxy() as data:
@@ -57,6 +62,11 @@ async def register_name(message: types.Message, state: FSMContext) -> None:
 
     await message.reply('Номер твоей группы')
     await Profile.next()
+
+
+@dp.message_handler(lambda message: message.text in ['/start', '/register', '/popular_questions'], state=Profile.group)
+async def invalid_group(message: types.Message) -> None:
+    await message.answer('Некорректная группа')
 
 
 @dp.message_handler(state=Profile.group)
@@ -69,6 +79,11 @@ async def register_group(message: types.Message, state: FSMContext) -> None:
                         'заявление)\n4.Перезачёт стажировки'
                         '\n<b>отправьте номер выбранного варианта</b>', parse_mode='html')
     await Profile.next()
+
+
+@dp.message_handler(lambda message: message.text not in ['1', '2', '3', '4'], state=Profile.educational_practice)
+async def invalid_educational_practice(message: types.Message) -> None:
+    await message.answer('Введите номер варианта')
 
 
 @dp.message_handler(state=Profile.educational_practice)
@@ -94,6 +109,11 @@ async def register_educational_practice(message: types.Message, state: FSMContex
     await Profile.next()
 
 
+@dp.message_handler(lambda message: message.text in ['/start', '/register', '/popular_questions'], state=Profile.educational_practice_2)
+async def invalid_educational_practice_2(message: types.Message) -> None:
+    await message.answer('Некорректный ввод')
+
+
 @dp.message_handler(state=Profile.educational_practice_2)
 async def register_educational_practice_2(message: types.Message, state: FSMContext) -> None:
     async with state.proxy() as data:
@@ -107,6 +127,11 @@ async def register_educational_practice_2(message: types.Message, state: FSMCont
     await Profile.next()
 
 
+@dp.message_handler(lambda message: message.text in ['/start', '/register', '/popular_questions'], state=Profile.industrial_practice)
+async def invalid_industrial_practice(message: types.Message) -> None:
+    await message.answer('Некорректный ввод')
+
+
 @dp.message_handler(state=Profile.industrial_practice)
 async def register_industrial_practice(message: types.Message, state: FSMContext) -> None:
     async with state.proxy() as data:
@@ -116,10 +141,15 @@ async def register_industrial_practice(message: types.Message, state: FSMContext
                         'договор и заявку на практику)\n1.Договор и заявка подписаны и сданы в Центр '
                         'карьеры\n2.Договор и заявка подписаны и НЕ сданы в Центр карьеры\n3.Договор '
                         'подписан и сдан в Центр карьеры\n4.Договор подписан и НЕ сдан в Центр карьеры'
-                        '\n<b>отправьте номер выбранного варианта</b>'
+                        '\n<b>отправьте номер выбранного варианта</b>\n'
                         '<b>Если вы не проходите производсвтенную практику в сторонней организации, напишите "-"</b>',
                         parse_mode='html')
     await Profile.next()
+
+
+@dp.message_handler(lambda message: message.text not in ['1', '2', '3', '4', '-'], state=Profile.other_industrial_practice)
+async def invalid_other_industrial_practice(message: types.Message) -> None:
+    await message.answer('Введите номер варианта')
 
 
 @dp.message_handler(state=Profile.other_industrial_practice)
@@ -146,6 +176,11 @@ async def register_other_industrial_practice(message: types.Message, state: FSMC
     await Profile.next()
 
 
+@dp.message_handler(lambda message: message.text in ['/start', '/register', '/popular_questions'], state=Profile.work_industrial_practice)
+async def invalid_work_industrial_practice(message: types.Message) -> None:
+    await message.answer('Некорректный ввод')
+
+
 @dp.message_handler(state=Profile.work_industrial_practice)
 async def register_work_industrial_practice(message: types.Message, state: FSMContext) -> None:
     async with state.proxy() as data:
@@ -153,20 +188,30 @@ async def register_work_industrial_practice(message: types.Message, state: FSMCo
 
     await message.reply('Если <b>производственная практика</b> в сторонней организации и подписана заявка, '
                         'Отправьте ссылку на заявку '
-                        'заявку'
+                        'заявку\n'
                         '<b>Если у вас нет заявки напишите "-"</b>', parse_mode='html')
     await Profile.next()
+
+
+@dp.message_handler(lambda message: message.text in ['/start', '/register', '/popular_questions'], state=Profile.other_industrial_practice_fileName)
+async def invalid_other_industrial_practice_fileName(message: types.Message) -> None:
+    await message.answer('Некорректный ввод')
 
 
 @dp.message_handler(state=Profile.other_industrial_practice_fileName)
 async def register_other_industrial_practice_fileName(message: types.Message, state: FSMContext) -> None:
     async with state.proxy() as data:
-        data['other_industrial_practice_fileName'] = message.document.file_id
+        data['other_industrial_practice_fileName'] = message.text
 
     await message.reply('<b>Преддипломная практика</b>\n1.Руководитель ВКР уже есть,\n2.Руководителя '
                         'ВКР ещё нет'
                         '\n<b>отправьте номер выбранного варианта</b>', parse_mode='html')
     await Profile.next()
+
+
+@dp.message_handler(lambda message: message.text not in ['1', '2'], state=Profile.undergraduate_practice)
+async def invalid_undergraduate_practice(message: types.Message) -> None:
+    await message.answer('Введите номер варианта')
 
 
 @dp.message_handler(state=Profile.undergraduate_practice)
