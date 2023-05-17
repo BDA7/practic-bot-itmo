@@ -10,7 +10,7 @@ sheetId = "1LudWwZpHk3wrqkZkX103py7NVM7oUA6Yctjrnog63UA"
 
 # Загрузка данных в гугл таблицу
 async def loadDataToSheet(data):
-    creds_json = os.path.dirname(__file__) + "/practice-384008-81be211bdbe4.json"
+    creds_json = os.path.dirname(__file__) + "/my.json"
     scopes = ['https://www.googleapis.com/auth/spreadsheets']
 
     creds_service = ServiceAccountCredentials.from_json_keyfile_name(creds_json, scopes).authorize(httplib2.Http())
@@ -36,7 +36,7 @@ async def loadDataToSheet(data):
 
 # Получение популярных вопросов с таблицы
 async def getQuestions():
-    creds_json = os.path.dirname(__file__) + "/practice-384008-81be211bdbe4.json"
+    creds_json = os.path.dirname(__file__) + "/my.json"
     scopes = ['https://www.googleapis.com/auth/spreadsheets']
 
     creds_service = ServiceAccountCredentials.from_json_keyfile_name(creds_json, scopes).authorize(httplib2.Http())
@@ -44,5 +44,7 @@ async def getQuestions():
     service = build('sheets', 'v4', http=creds_service)
     sheet = service.spreadsheets()
     resp = sheet.values().batchGet(spreadsheetId=sheetId, ranges=["Лист2"]).execute()
-    questions = resp['valueRanges'][0]['values']
-    return questions
+    sheetQuestions = resp['valueRanges'][0]['values']
+    return sheetQuestions
+
+

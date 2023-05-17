@@ -14,6 +14,7 @@ bot = Bot(TOKEN_API)
 dp = Dispatcher(bot, storage=storage)
 
 questions = []
+typesQuestions = []
 
 
 # Стейты для регистрации
@@ -235,12 +236,31 @@ async def register_undergraduate_practice(message: types.Message, state: FSMCont
 @dp.message_handler(commands=['popular_questions'])
 async def popular_questions(message: types.Message) -> None:
     global questions
+    global typesQuestions
     questions = await getQuestions()
+    typesQuestions = await getTypes(questions)
     keyboard = InlineKeyboardMarkup()
-    for question in questions:
-        inlineButton = InlineKeyboardButton(question[1], callback_data=question[0])
+    for typeQuestion in typesQuestions:
+        inlineButton = InlineKeyboardButton(typeQuestion, callback_data=typeQuestion)
         keyboard.add(inlineButton)
     await bot.send_message(message.from_user.id, text='Популярные вопросы: ', reply_markup=keyboard)
+
+
+async def getTypes(values):
+    return list(set([value[1] for value in values]))
+
+
+@dp.callback_query_handler(lambda callback: callback.data in typesQuestions)
+async def callback_types(message: types.CallbackQuery):
+    print(message.data)
+    keyboard = InlineKeyboardMarkup(row_width=2)
+    questionsForType = [question for question in questions if question[1] == message.data]
+    questionsForType = sorted(questionsForType, key=len, reverse=True)
+    for qus in questionsForType:
+        inlineButton = InlineKeyboardButton(qus[2], callback_data=qus[0])
+        keyboard.add(inlineButton)
+    await bot.send_message(message.from_user.id, text='Вопросы из выбранной категории вами категории: ' + message.data + ' ', reply_markup=keyboard)
+    print(questionsForType)
 
 
 # Ответ на попрос
@@ -248,7 +268,7 @@ async def popular_questions(message: types.Message) -> None:
 async def callback_questions(callback: types.CallbackQuery):
     if callback.data.isdigit():
         idx = int(callback.data) - 1
-        await callback.message.answer('Ответ: ' + questions[idx][2])
+        await callback.message.answer('Ваш вопрос ' + questions[idx][2] + '\nОтвет: ' + questions[idx][3])
 
 
 if __name__ == '__main__':
